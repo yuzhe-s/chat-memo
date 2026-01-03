@@ -36,6 +36,11 @@ class Note(db.Model):
     messages = db.relationship('NoteMessage', backref='note', lazy=True, cascade='all, delete-orphan')
     tags = db.relationship('Tag', secondary=note_tags, backref=db.backref('notes', lazy=True))
 
+    @property
+    def message_count(self):
+        """获取消息数量"""
+        return len(self.messages)
+
     def to_dict(self):
         return {
             'id': self.id,
