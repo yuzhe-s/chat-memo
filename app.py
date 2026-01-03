@@ -53,6 +53,17 @@ def view_note(note_id):
         session['user_id'] = str(uuid.uuid4())[:8]
 
     note = Note.query.get_or_404(note_id)
+
+    # 管理员可以绕过密码检查
+    is_admin = session.get('is_admin', False)
+
+    # 检查是否需要密码
+    if note.password and not is_admin:
+        # 检查会话中是否已验证过此纸条的密码
+        verified_notes = session.get('verified_notes', [])
+        if note_id not in verified_notes:
+            return render_template('password_prompt.html', note=note, user_id=session['user_id'])
+
     note.view_count += 1
     db.session.commit()
 
@@ -66,6 +77,17 @@ def share_note(share_key):
         session['user_id'] = str(uuid.uuid4())[:8]
 
     note = Note.query.filter_by(share_key=share_key).first_or_404()
+
+    # 管理员可以绕过密码检查
+    is_admin = session.get('is_admin', False)
+
+    # 检查是否需要密码
+    if note.password and not is_admin:
+        # 检查会话中是否已验证过此纸条的密码
+        verified_notes = session.get('verified_notes', [])
+        if note.id not in verified_notes:
+            return render_template('password_prompt.html', note=note, user_id=session['user_id'])
+
     note.view_count += 1
     db.session.commit()
 
@@ -80,6 +102,23 @@ def search():
 
     all_tags = Tag.query.all()
     return render_template('search.html', user_id=session['user_id'], tags=all_tags)
+
+
+@app.route('/verify-password/<int:note_id>', methods=['POST'])
+def verify_password(note_id):
+    """验证纸条密码"""
+    password = request.json.get('password', '')
+    note = Note.query.get_or_404(note_id)
+
+    if note.password and password == note.password:
+        # 密码正确，将纸条ID添加到已验证列表
+        if 'verified_notes' not in session:
+            session['verified_notes'] = []
+        session['verified_notes'].append(note_id)
+        session.modified = True
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'message': '密码错误'}), 401
 
 
 @app.route('/api/search')
@@ -118,6 +157,9 @@ def admin():
     password = request.args.get('password')
     if password != os.environ.get('ADMIN_PASSWORD', 'admin123'):
         return "未授权访问", 401
+
+    # 管理员可以访问所有纸条（无需密码），标记管理员身份
+    session['is_admin'] = True
 
     # 统计数据
     stats = {
@@ -173,6 +215,7 @@ def handle_create_note(data):
     title = data.get('title', '').strip()
     content = data.get('content', '').strip()
     tag_names = data.get('tags', [])
+    password = data.get('password', '').strip()  # 获取密码
     is_public = data.get('is_public', True)
 
     if not title:
@@ -188,6 +231,7 @@ def handle_create_note(data):
         title=title,
         content=content,
         share_key=share_key,
+        password=password if password else None,  # 只在有密码时保存
         is_public=is_public
     )
 

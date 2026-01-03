@@ -27,6 +27,7 @@ class Note(db.Model):
     content = db.Column(db.Text, nullable=True)
     share_key = db.Column(db.String(20), unique=True, nullable=True, index=True)
     is_public = db.Column(db.Boolean, default=True, index=True)
+    password = db.Column(db.String(100), nullable=True)  # 纸条密码（可选）
     view_count = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=get_beijing_time)
     updated_at = db.Column(db.DateTime, default=get_beijing_time, onupdate=get_beijing_time)
@@ -42,6 +43,7 @@ class Note(db.Model):
             'content': self.content,
             'share_key': self.share_key,
             'is_public': self.is_public,
+            'has_password': bool(self.password),  # 只返回是否有密码，不返回密码本身
             'view_count': self.view_count,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),

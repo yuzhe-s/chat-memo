@@ -28,6 +28,7 @@ if (createForm) {
 
         const title = document.getElementById('note-title').value.trim();
         const content = document.getElementById('note-content').value.trim();
+        const password = document.getElementById('note-password')?.value.trim() || '';
 
         // 获取选中的标签
         const selectedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked'))
@@ -41,6 +42,7 @@ if (createForm) {
         socket.emit('create_note', {
             title: title,
             content: content,
+            password: password,
             tags: selectedTags,
             is_public: true
         });
