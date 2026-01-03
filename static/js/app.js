@@ -5,6 +5,7 @@ const socket = io();
 let currentNoteId = null;
 let currentSenderName = '';
 let currentShareKey = null;
+let myUserId = null;  // 用于识别自己的消息
 
 // HTML转义，防止XSS攻击
 function escapeHtml(text) {
@@ -87,17 +88,23 @@ const sendBtn = document.getElementById('send-btn');
 if (window.currentNoteId) {
     currentNoteId = window.currentNoteId;
     currentShareKey = window.currentShareKey;
+    myUserId = window.currentUserId;
 
     // 从本地存储获取昵称
     const savedName = localStorage.getItem('sender_name');
-    if (savedName && senderNameInput) {
-        senderNameInput.value = savedName;
-    }
+    let hasJoined = false;  // 标记是否已加入房间
 
     // 加入纸条
     function joinNote() {
         const name = senderNameInput ? senderNameInput.value.trim() : '';
-        currentSenderName = name || `用户${window.currentUserId}`;
+
+        if (!name) {
+            // 还没有输入昵称，不加入
+            return;
+        }
+
+        currentSenderName = name;
+        hasJoined = true;
 
         socket.emit('join_note', {
             note_id: currentNoteId,
@@ -105,13 +112,34 @@ if (window.currentNoteId) {
         });
     }
 
-    // 延迟加入，等待昵称输入
-    setTimeout(joinNote, 500);
+    // 初始化昵称输入框
+    if (savedName && senderNameInput) {
+        senderNameInput.value = savedName;
+        currentSenderName = savedName;
+        // 如果有保存的昵称，立即加入房间
+        joinNote();
+    } else if (senderNameInput) {
+        // 如果没有昵称，显示输入提示
+        senderNameInput.placeholder = "请输入你的昵称...";
+        senderNameInput.focus();
+    }
 
-    // 监听昵称变化
+    // 监听昵称输入，完成时才加入
     if (senderNameInput) {
-        senderNameInput.addEventListener('change', () => {
-            localStorage.setItem('sender_name', senderNameInput.value.trim());
+        senderNameInput.addEventListener('blur', () => {
+            const name = senderNameInput.value.trim();
+            if (name && !hasJoined) {
+                localStorage.setItem('sender_name', name);
+                joinNote();
+            }
+        });
+
+        senderNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && senderNameInput.value.trim() && !hasJoined) {
+                localStorage.setItem('sender_name', senderNameInput.value.trim());
+                joinNote();
+                messageInput.focus();
+            }
         });
     }
 
@@ -185,7 +213,8 @@ socket.on('viewer_count_changed', (data) => {
 function addMessageToChat(message) {
     if (!messagesContainer) return;
 
-    const isOwn = message.sender_name === currentSenderName;
+    // 使用 sender_id 判断是否是自己的消息
+    const isOwn = message.sender_id === myUserId;
     const messageEl = document.createElement('div');
 
     if (message.message_type === 'system') {
@@ -292,9 +321,23 @@ function deleteNote(noteId) {
     socket.emit('delete_note', {note_id: noteId});
 }
 
+function deleteTag(tagId, tagName) {
+    if (!confirm(`确定要删除标签"${tagName}"吗？\n\n删除后，该标签将从所有关联的纸条中移除。此操作不可恢复！`)) {
+        return;
+    }
+
+    socket.emit('delete_tag', {tag_id: tagId});
+}
+
 // Socket.IO: 纸条删除成功
 socket.on('note_deleted', (data) => {
     alert('纸条已删除');
+    location.reload();
+});
+
+// Socket.IO: 标签删除成功
+socket.on('tag_deleted', (data) => {
+    alert(`标签"${data.tag_name}"已删除`);
     location.reload();
 });
 

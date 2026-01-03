@@ -62,7 +62,45 @@
                             <td>{{ note.view_count }}</td>
                             <td>{{ note.message_count }}</td>
                             <td>
-                                <button onclick="deleteNote({{ note.id }})" class="btn btn-danger btn-small">删除</button>
+                                <button onclick="deleteNote({{ note.id }})" class="btn-delete">删除</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 标签列表 -->
+            <div class="notes-table-container" style="margin-top: 2rem;">
+                <h3>所有标签</h3>
+                <table class="notes-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>标签名称</th>
+                            <th>颜色</th>
+                            <th>关联纸条数</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tag in tags %}
+                        <tr>
+                            <td>{{ tag.id }}</td>
+                            <td>
+                                <span class="tag-small" style="background-color: {{ tag.color }}20; color: {{ tag.color }};">
+                                    {{ tag.name }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="color-preview">
+                                    <span class="color-box" style="background-color: {{ tag.color }};"></span>
+                                    <span class="color-code">{{ tag.color }}</span>
+                                </div>
+                            </td>
+                            <td>{{ tag.note_count }}</td>
+                            <td>
+                                <button onclick="deleteTag({{ tag.id }}, '{{ tag.name }}')" class="btn-delete">删除</button>
                             </td>
                         </tr>
                         {% endfor %}

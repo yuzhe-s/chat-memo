@@ -100,11 +100,15 @@ def api_search():
             )
         )
 
-    # 标签筛选
+    # 标签筛选 - 修复多标签筛选逻辑
     if tags:
-        notes_query = notes_query.join(Note.tags).filter(Tag.name.in_(tags))
+        # 使用子查询，找到包含所有指定标签的纸条
+        for tag_name in tags:
+            notes_query = notes_query.filter(
+                Note.tags.any(Tag.name == tag_name)
+            )
 
-    notes = notes_query.order_by(Note.updated_at.desc()).limit(50).all()
+    notes = notes_query.distinct().order_by(Note.updated_at.desc()).limit(50).all()
     return jsonify({'notes': [note.to_dict() for note in notes]})
 
 
@@ -123,7 +127,8 @@ def admin():
     }
 
     notes = Note.query.order_by(Note.created_at.desc()).all()
-    return render_template('admin.html', stats=stats, notes=notes)
+    tags = Tag.query.order_by(Tag.name).all()
+    return render_template('admin.html', stats=stats, notes=notes, tags=tags)
 
 
 # ========== Socket.IO 事件处理 ==========
@@ -292,6 +297,7 @@ def handle_send_note_message(data):
     message = NoteMessage(
         note_id=note_id,
         sender_name=sender_name,
+        sender_id=user_id,
         content=content
     )
     db.session.add(message)
@@ -358,6 +364,22 @@ def handle_delete_note(data):
         emit('error', {'message': '纸条不存在'})
 
 
+@socketio.on('delete_tag')
+def handle_delete_tag(data):
+    """删除标签（仅管理员）"""
+    tag_id = data['tag_id']
+    tag = Tag.query.get(tag_id)
+
+    if tag:
+        tag_name = tag.name
+        db.session.delete(tag)
+        db.session.commit()
+        emit('tag_deleted', {'tag_id': tag_id, 'tag_name': tag_name}, broadcast=True)
+        print(f"标签 {tag_name} (ID: {tag_id}) 已删除")
+    else:
+        emit('error', {'message': '标签不存在'})
+
+
 if __name__ == '__main__':
     # 创建数据库表
     with app.app_context():
@@ -365,5 +387,6 @@ if __name__ == '__main__':
         print("数据库表已创建")
 
     # 启动应用
-    print("聊天备忘录启动在 http://localhost:5000")
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5001))  # 默认使用 5001 端口
+    print(f"聊天备忘录启动在 http://localhost:{port}")
+    socketio.run(app, debug=True, host='0.0.0.0', port=port)

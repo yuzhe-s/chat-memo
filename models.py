@@ -57,6 +57,7 @@ class NoteMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     note_id = db.Column(db.Integer, db.ForeignKey('notes.id'), nullable=False)
     sender_name = db.Column(db.String(100), nullable=False)
+    sender_id = db.Column(db.String(50), nullable=False)  # 添加发送者ID字段
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=get_beijing_time)
     message_type = db.Column(db.String(20), default='text')
@@ -66,6 +67,7 @@ class NoteMessage(db.Model):
             'id': self.id,
             'note_id': self.note_id,
             'sender_name': self.sender_name,
+            'sender_id': self.sender_id,
             'content': self.content,
             'timestamp': self.timestamp.isoformat(),
             'message_type': self.message_type
