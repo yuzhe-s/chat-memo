@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天备忘录</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">💬 聊天备忘录</h1>
+                <div class="nav-links">
+                    <a href="/" class="nav-link active">首页</a>
+                    <a href="/create" class="nav-link">创建纸条</a>
+                    <a href="/search" class="nav-link">搜索</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主内容 -->
+        <div class="main-container">
+            <!-- 侧边栏 -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>热门标签</h3>
+                    <div class="tags-list" id="tags-list">
+                        {% for tag in tags %}
+                        <span class="tag" style="background-color: {{ tag.color }}20; color: {{ tag.color }}; border: 1px solid {{ tag.color }};">
+                            {{ tag.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>快速操作</h3>
+                    <a href="/create" class="btn btn-primary btn-full">+ 新建纸条</a>
+                </div>
+            </aside>
+
+            <!-- 纸条列表 -->
+            <main class="content">
+                <div class="notes-list" id="notes-list">
+                    {% for note in notes %}
+                    <div class="note-card" onclick="window.location.href='/note/{{ note.id }}'">
+                        <div class="note-header">
+                            <h3 class="note-title">{{ note.title }}</h3>
+                            <div class="note-meta">
+                                <span class="note-date">{{ note.created_at.strftime('%Y-%m-%d') }}</span>
+                                <span class="note-views">👁 {{ note.view_count }}</span>
+                            </div>
+                        </div>
+
+                        {% if note.content %}
+                        <p class="note-preview">{{ note.content[:100] }}{% if note.content|length > 100 %}...{% endif %}</p>
+                        {% endif %}
+
+                        <div class="note-footer">
+                            <div class="note-tags">
+                                {% for tag in note.tags %}
+                                <span class="tag-small" style="background-color: {{ tag.color }}20; color: {{ tag.color }};">
+                                    {{ tag.name }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            <div class="note-stats">
+                                <span>💬 {{ note.message_count }} 条消息</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% if not notes %}
+                    <div class="empty-state">
+                        <p>还没有纸条，<a href="/create">创建第一个纸条</a>吧！</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        window.currentUserId = "{{ user_id }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

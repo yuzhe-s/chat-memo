@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 聊天备忘录</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">💬 聊天备忘录</h1>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">首页</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 管理面板 -->
+        <div class="admin-container">
+            <h2>📊 管理后台</h2>
+
+            <!-- 统计卡片 -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <h3>总纸条数</h3>
+                    <p class="stat-number">{{ stats.total_notes }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>总消息数</h3>
+                    <p class="stat-number">{{ stats.total_messages }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>活跃标签</h3>
+                    <p class="stat-number">{{ stats.active_tags }}</p>
+                </div>
+            </div>
+
+            <!-- 纸条列表 -->
+            <div class="notes-table-container">
+                <h3>所有纸条</h3>
+                <table class="notes-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>标题</th>
+                            <th>创建时间</th>
+                            <th>浏览次数</th>
+                            <th>消息数</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for note in notes %}
+                        <tr>
+                            <td>{{ note.id }}</td>
+                            <td><a href="/note/{{ note.id }}" target="_blank">{{ note.title }}</a></td>
+                            <td>{{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ note.view_count }}</td>
+                            <td>{{ note.message_count }}</td>
+                            <td>
+                                <button onclick="deleteNote({{ note.id }})" class="btn btn-danger btn-small">删除</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

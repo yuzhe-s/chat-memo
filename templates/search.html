@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索 - 聊天备忘录</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">💬 聊天备忘录</h1>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">首页</a>
+                    <a href="/create" class="nav-link">创建纸条</a>
+                    <a href="/search" class="nav-link active">搜索</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 搜索容器 -->
+        <div class="search-container">
+            <div class="search-box">
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="搜索纸条标题或内容..."
+                    autofocus>
+                <button id="search-btn" class="btn btn-primary">🔍 搜索</button>
+            </div>
+
+            <!-- 标签筛选 -->
+            <div class="tag-filter">
+                <h3>按标签筛选</h3>
+                <div class="tags-list" id="tag-filters">
+                    {% for tag in tags %}
+                    <label class="tag-checkbox">
+                        <input type="checkbox" name="tags" value="{{ tag.name }}">
+                        <span class="tag-label" style="background-color: {{ tag.color }}20; color: {{ tag.color }}; border: 1px solid {{ tag.color }};">
+                            {{ tag.name }}
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 搜索结果 -->
+            <div class="search-results" id="search-results">
+                <div class="empty-state">
+                    <p>输入关键词开始搜索...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.currentUserId = "{{ user_id }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
