@@ -17,9 +17,9 @@
             <div class="nav-container">
                 <h1 class="logo">💬 无则の诗</h1>
                 <div class="nav-links">
-                    <a href="/" class="nav-link active">首页</a>
-                    <a href="/create" class="nav-link">创建纸条</a>
-                    <a href="/search" class="nav-link">搜索</a>
+                    <a href="/app" class="nav-link active">首页</a>
+                    <a href="/app/create" class="nav-link">创建纸条</a>
+                    <a href="/app/search" class="nav-link">搜索</a>
                 </div>
             </div>
         </nav>
@@ -41,7 +41,7 @@
 
                 <div class="sidebar-section">
                     <h3>快速操作</h3>
-                    <a href="/create" class="btn btn-primary btn-full">+ 新建纸条</a>
+                    <a href="/app/create" class="btn btn-primary btn-full">+ 新建纸条</a>
                 </div>
             </aside>
 
@@ -79,7 +79,7 @@
 
                     {% if not notes %}
                     <div class="empty-state">
-                        <p>还没有纸条，<a href="/create">创建第一个纸条</a>吧！</p>
+                        <p>还没有纸条，<a href="/app/create">创建第一个纸条</a>吧！</p>
                     </div>
                     {% endif %}
                 </div>

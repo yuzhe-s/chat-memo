@@ -2,7 +2,26 @@
   "permissions": {
     "allow": [
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(tasklist:*)",
+      "Bash(taskkill:*)",
+      "Bash(python:*)",
+      "Bash(timeout:*)",
+      "Bash(ping:*)",
+      "Bash(del:*)",
+      "Bash(if:*)",
+      "Bash(then rm instance/chat.db)",
+      "Bash(else echo \"Database doesn''t exist\")",
+      "Bash(fi:*)",
+      "Bash(for:*)",
+      "Bash(do sed:*)",
+      "Bash(done)"
     ]
   }
 }

@@ -21,6 +21,12 @@ note_users = {}
 
 
 @app.route('/')
+def landing():
+    """落地页 - 需要点击进入"""
+    return render_template('landing.html')
+
+
+@app.route('/app')
 def index():
     """首页 - 纸条列表"""
     # 生成用户ID
@@ -36,7 +42,7 @@ def index():
                          tags=all_tags)
 
 
-@app.route('/create')
+@app.route('/app/create')
 def create():
     """创建纸条页面"""
     if 'user_id' not in session:
@@ -94,7 +100,7 @@ def share_note(share_key):
     return render_template('view.html', note=note, user_id=session['user_id'])
 
 
-@app.route('/search')
+@app.route('/app/search')
 def search():
     """搜索页面"""
     if 'user_id' not in session:
