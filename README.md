@@ -1,4 +1,4 @@
-# 💬 聊天备忘录 (Chat Memo)
+# 💬 无则の诗 (Chat Memo)
 
 一个基于 Web 的实时对话笔记应用，让用户可以创建持久化的纸条并进行多轮对话。
 
@@ -35,6 +35,7 @@
 # 1. 克隆仓库
 git clone https://github.com/yuzhe-s/chat-memo.git
 cd chat-memo
+# 项目名称：无则の诗
 
 # 2. 安装依赖
 pip install -r requirements.txt
@@ -66,6 +67,8 @@ git add .
 git commit -m "Update application"
 git push origin main
 ```
+
+**项目名称**: 无则の诗
 
 ### 步骤 2: 在 Render 上创建项目
 

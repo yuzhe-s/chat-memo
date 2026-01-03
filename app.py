@@ -388,5 +388,5 @@ if __name__ == '__main__':
 
     # 启动应用
     port = int(os.environ.get('PORT', 5001))  # 默认使用 5001 端口
-    print(f"聊天备忘录启动在 http://localhost:{port}")
+    print(f"无则の诗启动在 http://localhost:{port}")
     socketio.run(app, debug=True, host='0.0.0.0', port=port)

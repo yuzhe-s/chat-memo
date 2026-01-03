@@ -351,4 +351,4 @@ socket.on('error', (data) => {
 
 // ========== 页面加载完成 ==========
 
-console.log('聊天备忘录已初始化，用户ID:', window.currentUserId);
+console.log('无则の诗已初始化，用户ID:', window.currentUserId);
