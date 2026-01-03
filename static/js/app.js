@@ -94,19 +94,20 @@ if (window.currentNoteId) {
 
     // 从本地存储获取昵称
     const savedName = localStorage.getItem('sender_name');
-    let hasJoined = false;  // 标记是否已加入房间
 
     // 加入纸条
     function joinNote() {
-        const name = senderNameInput ? senderNameInput.value.trim() : '';
+        let name = senderNameInput ? senderNameInput.value.trim() : '';
 
         if (!name) {
-            // 还没有输入昵称，不加入
-            return;
+            // 如果没有昵称，使用用户ID作为临时昵称
+            name = `用户${myUserId}`;
+            if (senderNameInput) {
+                senderNameInput.value = name;
+            }
         }
 
         currentSenderName = name;
-        hasJoined = true;
 
         socket.emit('join_note', {
             note_id: currentNoteId,
@@ -118,28 +119,29 @@ if (window.currentNoteId) {
     if (savedName && senderNameInput) {
         senderNameInput.value = savedName;
         currentSenderName = savedName;
-        // 如果有保存的昵称，立即加入房间
-        joinNote();
     } else if (senderNameInput) {
         // 如果没有昵称，显示输入提示
         senderNameInput.placeholder = "请输入你的昵称...";
         senderNameInput.focus();
     }
 
-    // 监听昵称输入，完成时才加入
+    // 立即加入房间（无论有没有昵称）
+    joinNote();
+
+    // 监听昵称修改
     if (senderNameInput) {
         senderNameInput.addEventListener('blur', () => {
             const name = senderNameInput.value.trim();
-            if (name && !hasJoined) {
+            if (name && name !== currentSenderName) {
                 localStorage.setItem('sender_name', name);
-                joinNote();
+                currentSenderName = name;
             }
         });
 
         senderNameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && senderNameInput.value.trim() && !hasJoined) {
+            if (e.key === 'Enter' && senderNameInput.value.trim()) {
                 localStorage.setItem('sender_name', senderNameInput.value.trim());
-                joinNote();
+                currentSenderName = senderNameInput.value.trim();
                 messageInput.focus();
             }
         });
